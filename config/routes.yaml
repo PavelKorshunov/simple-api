@@ -1,0 +1,5 @@
+# config/routes.yaml
+main_show:
+  path: /
+  controller: App\Controllers\MainController
+  methods: GET

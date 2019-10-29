@@ -8,9 +8,8 @@ $kernel = new Kernel();
 
 try {
     $parameters = $kernel->run()->matchRoute($_SERVER["REQUEST_URI"]);
+    $kernel->createController($parameters["_controller"]);
 
-    $main = new $parameters["_controller"];
-    $main();
 } catch (Exception $e) {
     echo $e->getMessage();
 }

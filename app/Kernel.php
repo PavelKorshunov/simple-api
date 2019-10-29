@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Helpers\ControllerResolver;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -34,6 +35,11 @@ class Kernel
      * @var RouteCollection
      */
     protected $routes;
+
+    /**
+     * @var ControllerResolver
+     */
+    protected $controllerResolver;
 
     /**
      * @var UrlMatcher
@@ -88,5 +94,34 @@ class Kernel
         $parameters = $matcher->match($path);
 
         return $parameters;
+    }
+
+
+    /**
+     * Создает объект контроллера и вызывает его метод если он есть
+     *
+     * @param string $controller
+     * @return void
+     */
+    public function createController(string $controller)
+    {
+        $this->controllerResolver = new ControllerResolver();
+        $callController = $this->controllerResolver->createController($controller);
+
+        if(is_array($callController) && is_object($callController[0]) && isset($callController[1])) {
+            try {
+                $reflection = new \ReflectionClass($callController[0]);
+                if($reflection->hasMethod($callController[1])) {
+                    $method = new \ReflectionMethod($callController[0], $callController[1]);
+                    $method->invoke($callController[0], $callController[1]);
+
+                    // TODO Необходимо вызывать метод с параметрами, если они есть ReflectionMethod::invokeArgs
+                } else {
+                    throw new \BadMethodCallException("Method " . $callController[1] . " not allowed");
+                }
+            } catch (\ReflectionException $e) {
+                echo $e->getMessage();
+            }
+        }
     }
 }

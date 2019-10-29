@@ -1,5 +1,5 @@
 # config/routes.yaml
-main_show:
-  path: /
-  controller: App\Controllers\MainController
+user_add:
+  path: /api/user/add
+  controller: App\Controllers\UserController::add
   methods: GET
